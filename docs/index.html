@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#12346a">
   <meta name="description" content="Assajda Success Academy Kano school portal preview.">
+  <link rel="icon" type="image/png" href="assets/assajda-logo.png">
   <title>Assajda Success Academy Kano | School Portal</title>
   <style>
     :root {
@@ -59,11 +60,15 @@
       height: 48px;
       flex: 0 0 auto;
       place-items: center;
-      border: 1px solid #ffffff70;
       border-radius: 50%;
-      color: var(--gold);
-      font-family: Georgia, serif;
-      font-size: 26px;
+      background: white;
+    }
+
+    .mark img {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      object-fit: cover;
     }
 
     .school-name { font-weight: 750; letter-spacing: .01em; }
@@ -159,7 +164,7 @@
   <div class="notice" role="status">Static website preview — portal sign-in and live school data are not available on GitHub Pages.</div>
   <header class="hero">
     <div class="nav">
-      <div class="mark" aria-hidden="true">A</div>
+      <div class="mark"><img src="assets/assajda-logo.png" alt=""></div>
       <div>
         <div class="school-name">Assajda Success Academy Kano</div>
         <div class="school-type">Primary and Secondary School</div>

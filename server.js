@@ -11,6 +11,7 @@ const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(ROOT, "data"));
 const DATABASE_PATH = path.resolve(process.env.DATABASE_PATH || path.join(DATA_DIR, "assajda.sqlite"));
 const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT || 4173);
+const ADMIN_SETUP_KEY = process.env.ADMIN_SETUP_KEY || "";
 const SESSION_MS = 8 * 60 * 60 * 1000;
 const MAX_JSON_BYTES = 3 * 1024 * 1024;
 const STATIC_FILES = new Set(["/index.html", "/styles.css", "/app.js", "/assets/assajda-logo.png"]);
@@ -264,7 +265,7 @@ function generatedStudentPassword() {
 async function handleApi(request, response, pathname) {
   if (request.method === "GET" && pathname === "/api/setup") {
     const exists = Boolean(database.prepare("SELECT id FROM users WHERE role = 'admin' LIMIT 1").get());
-    sendJson(response, 200, { setupRequired: !exists });
+    sendJson(response, 200, { setupRequired: !exists, setupKeyRequired: process.env.NODE_ENV === "production" });
     return;
   }
 
@@ -274,6 +275,18 @@ async function handleApi(request, response, pathname) {
       return;
     }
     const payload = await readJson(request, 16 * 1024);
+    if (process.env.NODE_ENV === "production") {
+      if (ADMIN_SETUP_KEY.length < 32) {
+        sendError(response, 503, "SETUP_UNAVAILABLE", "Administrator setup is not configured. Contact the portal administrator.");
+        return;
+      }
+      const providedKey = Buffer.from(String(payload.setupKey || ""));
+      const expectedKey = Buffer.from(ADMIN_SETUP_KEY);
+      if (providedKey.length !== expectedKey.length || !crypto.timingSafeEqual(providedKey, expectedKey)) {
+        sendError(response, 403, "INVALID_SETUP_KEY", "The administrator setup key is incorrect.");
+        return;
+      }
+    }
     const username = String(payload.username || "").trim();
     const password = String(payload.password || "");
     if (!validUsername(username)) {

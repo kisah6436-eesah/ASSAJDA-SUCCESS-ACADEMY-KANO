@@ -27,6 +27,19 @@ node server.js
 
 Then open <http://127.0.0.1:4174/>.
 
+## Deploy on Render
+
+Create a **Node Web Service** connected to this repository's `main` branch. Use the repository root as the root directory, `npm install` as the build command, and `npm start` as the start command. Render supplies `PORT`; set these environment variables:
+
+- `HOST=0.0.0.0`
+- `NODE_ENV=production`
+- `DATA_DIR=/var/data`
+- `ADMIN_SETUP_KEY` to a unique random secret of at least 32 characters. Keep it in Render's environment settings, not in the repository. Enter this key in the one-time setup form to create the administrator.
+
+Attach a persistent disk mounted at `/var/data`. Without it, the SQLite database and all school records are lost on service restarts or redeploys. Render persistent disks require a paid web service.
+
+The initial administrator setup uses the temporary password `pass`. Create the administrator immediately after the first deploy and change the password before sharing the public URL. Keep `ADMIN_SETUP_KEY` configured so setup stays protected if the database is reset. Do not enter real student information until you have confirmed persistent storage and backups.
+
 ## Create and manage accounts
 
 - **Teachers:** Sign in as administrator, open **Teachers**, then **Add teacher**. Assign a subject from Mathematics, English, Physics, Biology, Islamic Studies, or ICT, or choose **Other** and enter a subject. The assigned subject appears in the teacher list. New teacher accounts use the initial password `pass`. Teachers cannot change their own passwords; an administrator can reset them from the teacher list.

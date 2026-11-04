@@ -1,0 +1,11 @@
+{
+  "name": "assajda-school-portal",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0 <25"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}

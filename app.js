@@ -361,10 +361,11 @@
     });
   }
 
-  function setupScreen() {
+  function setupScreen(setupKeyRequired = false) {
     app.innerHTML = `<main class="login-screen"><section class="login-aside"><div class="login-brand"><img src="${LOGO}" alt="Assajda Success Academy logo"><div><strong>Assajda Success Academy Kano</strong><span>Primary and Secondary School</span></div></div><div class="login-pitch"><span class="eyebrow" style="color:#c6d8fa">Secure setup</span><h1>Create the administrator account.</h1><p>This one-time setup is available only while no administrator account exists.</p></div><div class="login-foot">No default usernames or passwords are installed.</div></section>
       <section class="login-panel-wrap"><div class="login-panel"><span class="eyebrow">First-time setup</span><h2>Set up administrator</h2><p class="notice warning">The initial password is pass. This is weak; change it to a strong password after setup.</p><form class="login-form" id="setup-form">
       <div class="field"><label for="setup-username">Administrator user ID</label><input class="field-input" id="setup-username" name="username" autocomplete="username" minlength="3" maxlength="64" pattern="[A-Za-z0-9._-]+" required></div>
+      ${setupKeyRequired ? `<div class="field"><label for="setup-key">Administrator setup key</label><input class="field-input" id="setup-key" name="setupKey" type="password" autocomplete="off" minlength="32" required></div>` : ""}
       <input type="hidden" id="setup-password" name="password" value="pass"><input type="hidden" id="setup-confirm" name="confirm" value="pass">
       <button class="primary-btn" type="submit">Create administrator</button><p id="setup-error" class="muted" role="alert"></p></form></div></section></main>`;
     document.getElementById("setup-form").addEventListener("submit", async (event) => {
@@ -378,7 +379,7 @@
       const button = form.querySelector('button[type="submit"]');
       button.disabled = true;
       try {
-        await api("/api/setup", { method: "POST", body: { username: data.get("username"), password: data.get("password") } });
+        await api("/api/setup", { method: "POST", body: { username: data.get("username"), password: data.get("password"), setupKey: data.get("setupKey") } });
         loginScreen("Administrator created. Sign in with the user ID and password you just chose.");
       } catch (error) {
         document.getElementById("setup-error").textContent = error.message;
@@ -751,7 +752,7 @@
     try {
       const setup = await api("/api/setup");
       if (setup.setupRequired) {
-        setupScreen();
+        setupScreen(setup.setupKeyRequired);
         return;
       }
       const result = await api("/api/session");
